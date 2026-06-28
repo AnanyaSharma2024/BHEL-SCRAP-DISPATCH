@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BHEL - Master Data Management</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .card-header { font-weight: 600; }
+    .table-hover tbody tr:hover { background-color: #f8f9fa; }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+    <div class="container">
+      <a class="bhel-brand" href="admin-dashboard.html">
+        <img src="img/bhel-logo.svg" alt="BHEL">
+        <span>BHEL Jhansi<span class="brand-sub">Master Data Management</span></span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMain">
+        <ul class="navbar-nav ms-auto align-items-lg-center">
+          <li class="nav-item"><a href="admin-dashboard.html" class="btn nav-btn">Active Requests</a></li>
+          <li class="nav-item"><a href="history.html" class="btn nav-btn">Dispatch History</a></li>
+          <li class="nav-item"><a href="masters.html" class="btn nav-btn active">Manage Masters</a></li>
+          <li class="nav-item"><a href="agreement.html" class="btn nav-btn">Sale Agreement</a></li>
+          <li class="nav-item dropdown">
+            <a href="#" class="btn nav-btn dropdown-toggle" data-bs-toggle="dropdown">Account</a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="change-password.html">Change Password</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><button class="dropdown-item text-danger" onclick="logout()">Logout</button></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="row">
+      <!-- LEFT COLUMN: Scrap Material Masters -->
+      <div class="col-md-6 mb-4">
+        <div class="card shadow-sm mb-4">
+          <div class="card-header bg-dark text-white">Add New Scrap Material to Master</div>
+          <div class="card-body">
+            <form id="add-scrap-form">
+              <div class="mb-3">
+                <label class="form-label">Material Name</label>
+                <input type="text" id="m-material" class="form-control" placeholder="e.g. CRGO Scrap, Copper Scrap" required>
+                <small class="text-muted">Example: CRGO, Steel, Copper, Aluminium</small>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Base Rate per kg (Rs.)</label>
+                <input type="number" id="m-rate" class="form-control" placeholder="e.g. 150" min="0" step="0.01" required>
+                <small class="text-muted">MSTC approved base rate in Rupees</small>
+              </div>
+              <button type="submit" class="btn btn-success w-100">Add Material Master</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+          <div class="card-header bg-white"><strong>Active Scrap Materials in Database</strong></div>
+          <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr><th>Material Name</th><th>Rate (Rs./kg)</th><th>Action</th></tr>
+              </thead>
+              <tbody id="scrap-master-list"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card shadow-sm">
+          <div class="card-header bg-dark text-white">Add New Department / Shop</div>
+          <div class="card-body">
+            <form id="add-dept-form">
+              <div class="mb-3">
+                <label class="form-label">Department / Shop Name</label>
+                <input type="text" id="m-dept" class="form-control" placeholder="e.g. Boiler Shop, Machine Shop, Foundry" required>
+                <small class="text-muted">BHEL approved department/shop name</small>
+              </div>
+              <button type="submit" class="btn btn-success w-100">Add Department Master</button>
+            </form>
+            <hr>
+            <table class="table table-hover mb-0">
+              <thead class="table-light"><tr><th>Department / Shop Name</th></tr></thead>
+              <tbody id="dept-master-list"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: Department Login Credential Management -->
+      <div class="col-md-6">
+        <div class="card shadow-sm mb-4 border border-primary border-2">
+          <div class="card-header bg-primary text-white">Generate Department Login Credentials</div>
+          <div class="card-body">
+            <p class="text-muted small mb-3">
+              <strong>Use this form to create login credentials for department heads.</strong><br>
+              Each department will get a username and password to access the portal.
+            </p>
+            <form id="generate-user-form">
+              <div class="mb-3">
+                <label class="form-label">Select Department</label>
+                <select id="u-dept" class="form-select" required>
+                  <option value="">-- Loading Departments --</option>
+                </select>
+                <small class="text-muted">Choose department from master list</small>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Login Username</label>
+                <input type="text" id="u-username" class="form-control" placeholder="e.g. boiler_dept, foundry_master" required>
+                <small class="text-muted">Must be unique (lowercase, no spaces)</small>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Login Password</label>
+                <input type="password" id="u-password" class="form-control" placeholder="Enter temporary password (minimum 6 chars)" minlength="6" required>
+                <small class="text-muted">Share this password securely with department head</small>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Create Secured Login Account</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="card shadow-sm">
+          <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <strong>Department Credential Register</strong>
+            <div>
+              <button class="btn btn-sm btn-outline-success" onclick="exportCredentialsCSV()">Export CSV</button>
+              <button class="btn btn-sm btn-outline-danger" onclick="exportCredentialsPDF()">Export PDF</button>
+            </div>
+          </div>
+          <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Department</th>
+                  <th>Username</th>
+                  <th>Created On</th>
+                  <th class="text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody id="cred-list"></tbody>
+            </table>
+          </div>
+          <div class="card-body border-top">
+            <small class="text-muted">
+              Only the Stores Admin can view, edit, or delete department login credentials.
+              Passwords are never shown here for security; use "Reset Password" while editing to issue a new one.
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Credential Modal -->
+  <div class="modal fade" id="editCredModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title">Edit Department Credentials</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="edit-cred-form">
+            <input type="hidden" id="edit-id">
+            <div class="mb-3">
+              <label class="form-label">Department</label>
+              <select id="edit-dept" class="form-select" required></select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Username</label>
+              <input type="text" id="edit-username" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Reset Password (optional)</label>
+              <input type="password" id="edit-password" class="form-control" placeholder="Leave blank to keep existing password" minlength="6">
+              <small class="text-muted">Only fill this if you want to issue a new password.</small>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+
+    if (!token || role !== 'admin') {
+      window.location.href = 'login.html';
+    }
+
+    function logout() {
+      apiLogout();
+    }
+
+    let credentialsData = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadScraps();
+      loadDepts();
+      loadCredentials();
+    });
+
+    // ========== SCRAP MATERIALS ==========
+    async function loadScraps() {
+      try {
+        const res = await apiFetch('/api/masters/scraps');
+        if (!res.ok) return;
+        const data = await res.json();
+        const list = document.getElementById('scrap-master-list');
+        list.innerHTML = '';
+
+        if (data.length === 0) {
+          list.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No scrap materials added yet</td></tr>';
+          return;
+        }
+
+        data.forEach(item => {
+          list.innerHTML += `
+            <tr>
+              <td><strong>${item.materialName}</strong></td>
+              <td>Rs. ${item.baseRatePerKg}</td>
+              <td><button onclick="deleteScrap('${item._id}')" class="btn btn-sm btn-danger py-0">Remove</button></td>
+            </tr>
+          `;
+        });
+      } catch (err) { console.error('Error loading scraps:', err); }
+    }
+
+    document.getElementById('add-scrap-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const materialName = document.getElementById('m-material').value;
+      const baseRatePerKg = Number(document.getElementById('m-rate').value);
+
+      try {
+        const res = await apiFetch('/api/masters/scraps', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ materialName, baseRatePerKg })
+        });
+        if (res.ok) {
+          alert('Scrap Material Master added successfully.');
+          document.getElementById('add-scrap-form').reset();
+          loadScraps();
+        } else {
+          const error = await res.json();
+          alert('Failed: ' + (error.message || 'Duplicate entry?'));
+        }
+      } catch (err) { console.error('Error adding scrap:', err); alert('Error adding material'); }
+    });
+
+    async function deleteScrap(id) {
+      if (!confirm('Are you sure you want to delete this scrap material?')) return;
+      try {
+        const res = await apiFetch(`/api/masters/scraps/${id}`, { method: 'DELETE' });
+        if (res.ok) { alert('Material removed successfully.'); loadScraps(); }
+        else { alert('Failed to delete material'); }
+      } catch (err) { console.error('Error deleting scrap:', err); }
+    }
+
+    // ========== DEPARTMENT MASTERS ==========
+    async function loadDepts() {
+      try {
+        const res = await apiFetch('/api/masters/departments');
+        if (!res.ok) return;
+        const data = await res.json();
+        const list = document.getElementById('dept-master-list');
+        const select = document.getElementById('u-dept');
+        const editSelect = document.getElementById('edit-dept');
+
+        list.innerHTML = '';
+        select.innerHTML = '<option value="">-- Choose Assigned Department --</option>';
+        editSelect.innerHTML = '';
+
+        if (data.length === 0) {
+          list.innerHTML = '<tr><td class="text-center text-muted">No departments added yet</td></tr>';
+          return;
+        }
+
+        data.forEach(item => {
+          list.innerHTML += `<tr><td><strong>${item.name}</strong></td></tr>`;
+          select.innerHTML += `<option value="${item.name}">${item.name}</option>`;
+          editSelect.innerHTML += `<option value="${item.name}">${item.name}</option>`;
+        });
+      } catch (err) { console.error('Error loading departments:', err); }
+    }
+
+    document.getElementById('add-dept-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('m-dept').value;
+
+      try {
+        const res = await apiFetch('/api/masters/departments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name })
+        });
+        if (res.ok) {
+          alert('Department Master added successfully.');
+          document.getElementById('add-dept-form').reset();
+          loadDepts();
+        } else {
+          const error = await res.json();
+          alert('Failed: ' + (error.message || 'Duplicate entry?'));
+        }
+      } catch (err) { console.error('Error adding department:', err); alert('Error adding department'); }
+    });
+
+    // ========== CREATE CREDENTIALS ==========
+    document.getElementById('generate-user-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const department = document.getElementById('u-dept').value;
+      const username = document.getElementById('u-username').value;
+      const password = document.getElementById('u-password').value;
+
+      if (!department || !username || !password) { alert('Please fill all fields'); return; }
+
+      try {
+        const res = await apiFetch('/api/auth/register-dept', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ department, username, password })
+        });
+        const result = await res.json();
+        if (res.ok) {
+          alert(result.message);
+          document.getElementById('generate-user-form').reset();
+          loadCredentials();
+        } else {
+          alert('Error: ' + (result.message || 'Unknown error'));
+        }
+      } catch (err) { console.error('Server connection error:', err); alert('Server Connection Error - Check console'); }
+    });
+
+    // ========== CREDENTIAL REGISTER (list / edit / delete / export) ==========
+    async function loadCredentials() {
+      try {
+        const res = await apiFetch('/api/auth/dept-users');
+        if (!res.ok) return;
+        credentialsData = await res.json();
+        renderCredentials();
+      } catch (err) { console.error('Error loading credentials:', err); }
+    }
+
+    function renderCredentials() {
+      const tbody = document.getElementById('cred-list');
+      tbody.innerHTML = '';
+
+      if (credentialsData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">No department credentials created yet.</td></tr>';
+        return;
+      }
+
+      credentialsData.forEach(item => {
+        const created = new Date(item.createdAt).toLocaleDateString('en-IN');
+        tbody.innerHTML += `
+          <tr>
+            <td>${item.department}</td>
+            <td><strong>${item.username}</strong></td>
+            <td>${created}</td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-outline-primary py-0" onclick="openEditCred('${item._id}')">Edit</button>
+              <button class="btn btn-sm btn-outline-danger py-0" onclick="deleteCred('${item._id}', '${item.username}')">Delete</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function openEditCred(id) {
+      const item = credentialsData.find(u => u._id === id);
+      if (!item) return;
+      document.getElementById('edit-id').value = item._id;
+      document.getElementById('edit-username').value = item.username;
+      document.getElementById('edit-dept').value = item.department;
+      document.getElementById('edit-password').value = '';
+      new bootstrap.Modal(document.getElementById('editCredModal')).show();
+    }
+
+    document.getElementById('edit-cred-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('edit-id').value;
+      const payload = {
+        username: document.getElementById('edit-username').value,
+        department: document.getElementById('edit-dept').value
+      };
+      const newPassword = document.getElementById('edit-password').value;
+      if (newPassword) payload.password = newPassword;
+
+      try {
+        const res = await apiFetch(`/api/auth/dept-users/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        if (res.ok) {
+          alert(result.message);
+          bootstrap.Modal.getInstance(document.getElementById('editCredModal')).hide();
+          loadCredentials();
+        } else {
+          alert('Error: ' + (result.message || 'Unknown error'));
+        }
+      } catch (err) { console.error(err); alert('Server Connection Error'); }
+    });
+
+    async function deleteCred(id, username) {
+      if (!confirm(`Delete login credentials for "${username}"? This cannot be undone.`)) return;
+      try {
+        const res = await apiFetch(`/api/auth/dept-users/${id}`, { method: 'DELETE' });
+        const result = await res.json();
+        if (res.ok) { alert(result.message); loadCredentials(); }
+        else { alert('Error: ' + (result.message || 'Unknown error')); }
+      } catch (err) { console.error(err); alert('Server Connection Error'); }
+    }
+
+    function exportCredentialsCSV() {
+      if (credentialsData.length === 0) { alert('No credentials to export.'); return; }
+      let csv = 'data:text/csv;charset=utf-8,';
+      csv += 'Department,Username,Created On\n';
+      credentialsData.forEach(item => {
+        const created = new Date(item.createdAt).toLocaleDateString('en-IN');
+        csv += `"${item.department}","${item.username}","${created}"\n`;
+      });
+      const link = document.createElement('a');
+      link.href = encodeURI(csv);
+      link.download = `BHEL_Department_Credentials_${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function exportCredentialsPDF() {
+      if (credentialsData.length === 0) { alert('No credentials to export.'); return; }
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.setFontSize(14);
+      doc.text('BHEL Jhansi - Department Login Credential Register', 14, 16);
+      doc.setFontSize(10);
+      doc.text(`Generated on: ${new Date().toLocaleString('en-IN')}`, 14, 22);
+
+      const rows = credentialsData.map(item => [
+        item.department,
+        item.username,
+        new Date(item.createdAt).toLocaleDateString('en-IN')
+      ]);
+
+      doc.autoTable({
+        startY: 28,
+        head: [['Department', 'Username', 'Created On']],
+        body: rows,
+        theme: 'grid',
+        headStyles: { fillColor: [0, 56, 118] }
+      });
+
+      doc.save(`BHEL_Department_Credentials_${new Date().toISOString().slice(0,10)}.pdf`);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+:root {
+    --bhel-blue: #003876;
+    --bhel-blue-dark: #00264f;
+    --bhel-blue-light: #e8f0fa;
+    --bhel-accent: #0d6efd;
+}
+
+body {
+    background-color: #f1f3f5;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.navbar {
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+    background-color: var(--bhel-blue) !important;
+}
+
+.navbar .btn-outline-light:hover {
+    background-color: var(--bhel-accent);
+    border-color: var(--bhel-accent);
+    color: #fff;
+}
+
+.bhel-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff !important;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.05rem;
+}
+
+.bhel-brand img {
+    height: 38px;
+    background: #fff;
+    border-radius: 4px;
+    padding: 3px;
+    flex-shrink: 0;
+}
+
+.bhel-brand .brand-sub {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: #cfe0f5;
+    letter-spacing: 0.3px;
+}
+
+.navbar .nav-btn {
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.35);
+    background: transparent;
+    font-size: 0.85rem;
+    padding: 6px 12px;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+.navbar .nav-btn:hover,
+.navbar .nav-btn.active {
+    background-color: var(--bhel-accent);
+    border-color: var(--bhel-accent);
+    color: #fff;
+}
+
+.navbar .nav-item {
+    margin: 3px 2px;
+}
+
+.navbar-toggler {
+    border-color: rgba(255,255,255,0.4);
+}
+.navbar-toggler-icon {
+    filter: invert(1);
+}
+
+@media (max-width: 991px) {
+    .navbar .navbar-nav {
+        margin-top: 10px;
+        padding-bottom: 6px;
+    }
+}
+
+.btn-primary {
+    background-color: var(--bhel-blue);
+    border-color: var(--bhel-blue);
+}
+.btn-primary:hover {
+    background-color: var(--bhel-blue-dark);
+    border-color: var(--bhel-blue-dark);
+}
+
+.bg-primary {
+    background-color: var(--bhel-blue) !important;
+}
+
+.text-primary {
+    color: var(--bhel-blue) !important;
+}
+
+.card {
+    border: none;
+    border-radius: 12px;
+}
+
+.login-container {
+    margin-top: 6%;
+}
+
+.login-logo-wrap {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    margin-bottom: 18px;
+}
+
+.login-logo {
+    height: 110px;
+}
+
+.login-company-name {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--bhel-blue);
+    letter-spacing: 0.5px;
+    margin-top: 10px;
+}
+
+.card-header.bg-primary {
+    background-color: var(--bhel-blue) !important;
+}
+
+footer.bhel-footer {
+    text-align: center;
+    color: #888;
+    font-size: 13px;
+    padding: 20px 0 10px;
+}

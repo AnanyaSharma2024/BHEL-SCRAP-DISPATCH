@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BHEL Scrap Dispatch</title>
+</head>
+<body>
+    <script>
+        // Yeh page sirf ek smart redirector hai - role ke hisaab se sahi dashboard kholta hai
+        const token = localStorage.getItem('token');
+        const role = localStorage.getItem('role');
+
+        if (!token) {
+            window.location.href = 'login.html';
+        } else if (role === 'admin') {
+            window.location.href = 'admin-dashboard.html';
+        } else if (role === 'department') {
+            window.location.href = 'dept-dashboard.html';
+        } else {
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

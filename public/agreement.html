@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BHEL - Sale Agreement</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .agreement-box {
+      background-color: #ffffff;
+      border: 1px solid #ced4da;
+      padding: 30px;
+      white-space: pre-wrap;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 380px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+    <div class="container">
+      <a class="bhel-brand" href="admin-dashboard.html">
+        <img src="img/bhel-logo.svg" alt="BHEL">
+        <span>BHEL Jhansi<span class="brand-sub">Plant Portal</span></span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMain">
+        <ul class="navbar-nav ms-auto align-items-lg-center" id="nav-buttons"></ul>
+      </div>
+    </div>
+  </nav>
+  <div class="container my-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start mb-4 gap-3">
+      <div>
+        <h3 class="text-secondary">Active Framework Purchase & Sale Agreement</h3>
+        <p class="text-muted">This agreement is loaded live from the BHEL database. Admin users can edit and publish updates here.</p>
+      </div>
+      <div class="text-md-end">
+        <button id="edit-btn" class="btn btn-outline-warning d-none me-2" onclick="toggleEditMode()">Edit Agreement Terms</button>
+        <button class="btn btn-success" onclick="window.print()">Print Agreement</button>
+      </div>
+    </div>
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div><strong>Agreement Title:</strong> <span id="agreement-title">Loading...</span></div>
+          <div class="text-muted" id="agreement-meta">Last updated: Loading...</div>
+        </div>
+        <div id="view-mode" class="agreement-box text-dark">Loading agreement from Database...</div>
+        <div id="edit-mode" class="d-none mt-3">
+          <textarea id="edit-textarea" class="form-control" rows="15"></textarea>
+          <div class="mt-3 d-flex justify-content-end gap-2">
+            <button class="btn btn-secondary" onclick="toggleEditMode()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveAgreement()">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="alert alert-info" role="alert">
+      Use this page to view the current agreement text and, if you are an admin, to edit it directly in the database.
+    </div>
+  </div>
+  <script src="js/api.js"></script>
+  <script>
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+    if (!token) { window.location.href = 'login.html'; }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      setupNavigation();
+      loadAgreement();
+    });
+
+    function setupNavigation() {
+      const nav = document.getElementById('nav-buttons');
+      if (role === 'admin') {
+        nav.innerHTML = `
+          <li class="nav-item"><a href="admin-dashboard.html" class="btn nav-btn">Active Requests</a></li>
+          <li class="nav-item"><a href="history.html" class="btn nav-btn">Dispatch History</a></li>
+          <li class="nav-item"><a href="masters.html" class="btn nav-btn">Manage Masters</a></li>
+          <li class="nav-item"><a href="agreement.html" class="btn nav-btn active">Sale Agreement</a></li>
+          <li class="nav-item dropdown">
+            <a href="#" class="btn nav-btn dropdown-toggle" data-bs-toggle="dropdown">Account</a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="change-password.html">Change Password</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><button class="dropdown-item text-danger" onclick="logout()">Logout</button></li>
+            </ul>
+          </li>
+        `;
+        document.getElementById('edit-btn').classList.remove('d-none');
+      } else {
+        nav.innerHTML = `
+          <li class="nav-item"><a href="dept-dashboard.html" class="btn nav-btn">Dashboard</a></li>
+          <li class="nav-item"><a href="agreement.html" class="btn nav-btn active">View Agreement</a></li>
+          <li class="nav-item dropdown">
+            <a href="#" class="btn nav-btn dropdown-toggle" data-bs-toggle="dropdown">Account</a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="change-password.html">Change Password</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><button class="dropdown-item text-danger" onclick="logout()">Logout</button></li>
+            </ul>
+          </li>
+        `;
+      }
+    }
+
+    function logout() { apiLogout(); }
+
+    async function loadAgreement() {
+      try {
+        const res = await apiFetch('/api/agreement');
+        if (!res.ok) {
+          if (res.status === 401 || res.status === 403) { logout(); return; }
+          throw new Error('Failed to load agreement');
+        }
+        const data = await res.json();
+        document.getElementById('agreement-title').innerText = data.title || 'Agreement Document';
+        document.getElementById('agreement-meta').innerText = `Last updated: ${new Date(data.lastUpdated).toLocaleString('en-IN')} by ${data.updatedBy}`;
+        document.getElementById('view-mode').innerText = data.content || 'No agreement content found.';
+        document.getElementById('edit-textarea').value = data.content || '';
+      } catch (err) {
+        console.error(err);
+        document.getElementById('view-mode').innerText = 'Unable to load agreement. Please try again later.';
+      }
+    }
+
+    function toggleEditMode() {
+      const viewDiv = document.getElementById('view-mode');
+      const editDiv = document.getElementById('edit-mode');
+      const editBtn = document.getElementById('edit-btn');
+      if (editDiv.classList.contains('d-none')) {
+        editDiv.classList.remove('d-none');
+        viewDiv.classList.add('d-none');
+        editBtn.innerText = 'Back to View Mode';
+      } else {
+        editDiv.classList.add('d-none');
+        viewDiv.classList.remove('d-none');
+        editBtn.innerText = 'Edit Agreement Terms';
+      }
+    }
+
+    async function saveAgreement() {
+      const updatedContent = document.getElementById('edit-textarea').value;
+      try {
+        const res = await apiFetch('/api/agreement', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content: updatedContent })
+        });
+        if (res.ok) {
+          alert('Agreement updated successfully in MongoDB!');
+          toggleEditMode();
+          loadAgreement();
+        } else {
+          const errorData = await res.json();
+          alert(errorData.message || 'Failed to update agreement.');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Failed to update agreement.');
+      }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

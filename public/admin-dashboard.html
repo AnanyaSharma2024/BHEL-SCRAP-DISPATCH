@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BHEL Stores - Admin Console</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+        <div class="container">
+            <a class="bhel-brand" href="admin-dashboard.html">
+                <img src="img/bhel-logo.svg" alt="BHEL">
+                <span>BHEL Jhansi<span class="brand-sub">Security &amp; Dispatch — Admin</span></span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navMain">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item"><a href="admin-dashboard.html" class="btn nav-btn active">Active Requests</a></li>
+                    <li class="nav-item"><a href="history.html" class="btn nav-btn">Dispatch History</a></li>
+                    <li class="nav-item"><a href="masters.html" class="btn nav-btn">Manage Masters</a></li>
+                    <li class="nav-item"><a href="agreement.html" class="btn nav-btn">Sale Agreement</a></li>
+                    <li class="nav-item dropdown">
+                        <a href="#" class="btn nav-btn dropdown-toggle" data-bs-toggle="dropdown">Account</a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="change-password.html">Change Password</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><button class="dropdown-item text-danger" onclick="logout()">Logout</button></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <h3 class="mb-4 text-secondary">Department-wise Scrap Release Requests</h3>
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card border-start border-4 border-warning shadow-sm">
+                    <div class="card-body">
+                        <h6 class="text-uppercase text-muted">Pending Requests</h6>
+                        <h2 id="stat-pending-count" class="mb-2">0</h2>
+                        <p class="mb-0 text-muted">Awaiting Security Gate Pass</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-start border-4 border-success shadow-sm">
+                    <div class="card-body">
+                        <h6 class="text-uppercase text-muted">Total Weight Dispatched</h6>
+                        <h2 id="stat-dispatched-weight" class="mb-2">0 kg</h2>
+                        <p class="mb-0 text-muted">Consignments cleared from plant</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-start border-4 border-info shadow-sm">
+                    <div class="card-body">
+                        <h6 class="text-uppercase text-muted">Total Outbound Trucks</h6>
+                        <h2 id="stat-truck-count" class="mb-2">0</h2>
+                        <p class="mb-0 text-muted">Transport vehicles cleared</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Origin Department</th>
+                            <th>Material / Scrap Type</th>
+                            <th>Weight Reported</th>
+                            <th>Reported Date</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-table-body">
+                        <!-- JS dynamically loads pending records -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

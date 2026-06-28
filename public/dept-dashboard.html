@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BHEL Department Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+        <div class="container">
+            <a class="bhel-brand" href="dept-dashboard.html" id="dept-title">
+                <img src="img/bhel-logo.svg" alt="BHEL">
+                <span>BHEL Jhansi<span class="brand-sub">Department Dashboard</span></span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navMain">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item"><a href="dept-dashboard.html" class="btn nav-btn active">Dashboard</a></li>
+                    <li class="nav-item"><a href="agreement.html" class="btn nav-btn">View Agreement</a></li>
+                    <li class="nav-item dropdown">
+                        <a href="#" class="btn nav-btn dropdown-toggle" data-bs-toggle="dropdown">Account</a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="change-password.html">Change Password</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><button class="dropdown-item text-danger" onclick="logout()">Logout</button></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <!-- Scrap report darj karne ka form -->
+            <div class="col-md-5 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">Report New Scrap Generation</div>
+                    <div class="card-body">
+                        <form id="report-form">
+                            <div class="mb-3">
+                                <label class="form-label">Select Scrap Material (From Master Data)</label>
+                                <select id="scrapType" class="form-select" required>
+                                    <option value="">-- Load Scrap Materials --</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Estimated Weight (kg)</label>
+                                <input type="number" id="weight" class="form-control" placeholder="e.g. 500" min="1" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Submit to Stores</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Apne department ka history -->
+            <div class="col-md-7">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-secondary text-white">Your Reported Scrap Logs</div>
+                    <div class="card-body p-0">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Material</th>
+                                    <th>Weight (kg)</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dept-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/dept.js"></script>
+</body>
+</html>

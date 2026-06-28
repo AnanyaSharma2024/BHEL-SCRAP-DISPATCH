@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BHEL Scrap - History</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    @media print {
+      body * { visibility: hidden; }
+      #printArea, #printArea * { visibility: visible; }
+      #printArea { position: absolute; left: 0; top: 0; width: 100%; }
+      .print-btn-div { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+    <div class="container">
+      <a class="bhel-brand" href="admin-dashboard.html">
+        <img src="img/bhel-logo.svg" alt="BHEL">
+        <span>BHEL Jhansi<span class="brand-sub">Security &amp; Dispatch — Admin</span></span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMain">
+        <ul class="navbar-nav ms-auto align-items-lg-center">
+          <li class="nav-item"><a href="admin-dashboard.html" class="btn nav-btn">Active Requests</a></li>
+          <li class="nav-item"><a href="history.html" class="btn nav-btn active">Dispatch History</a></li>
+          <li class="nav-item"><a href="masters.html" class="btn nav-btn">Manage Masters</a></li>
+          <li class="nav-item"><a href="agreement.html" class="btn nav-btn">Sale Agreement</a></li>
+          <li class="nav-item dropdown">
+            <a href="#" class="btn nav-btn dropdown-toggle" data-bs-toggle="dropdown">Account</a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="change-password.html">Change Password</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><button class="dropdown-item text-danger" onclick="logout()">Logout</button></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div class="container mb-5">
+    <h3 class="mb-4 text-secondary">Completed Consignment Dispatches</h3>
+    <div class="row align-items-center mb-3">
+      <div class="col-md-8 mb-2 mb-md-0">
+        <div class="input-group">
+          <span class="input-group-text">Search</span>
+          <input id="searchInput" type="search" class="form-control" placeholder="Gate Pass / Vehicle / Department / Driver" oninput="filterHistory()">
+        </div>
+      </div>
+      <div class="col-md-4 text-md-end">
+        <button class="btn btn-success" onclick="exportToCSV()">Export to Excel (CSV)</button>
+      </div>
+    </div>
+    <div class="card shadow-sm mb-4">
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Gate Pass No.</th>
+              <th>Origin Shop</th>
+              <th>Vehicle Number</th>
+              <th>Material Details</th>
+              <th>Driver Name</th>
+              <th class="text-center">PDF Report</th>
+            </tr>
+          </thead>
+          <tbody id="history-table-body">
+            <!-- JS dynamically loads rows -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Printable Challan -->
+    <div id="printArea" class="card d-none my-4">
+      <div class="card-body border border-dark p-5">
+        <div class="text-center mb-4">
+          <h2 class="mb-0"><strong>BHARAT HEAVY ELECTRICALS LIMITED</strong></h2>
+          <p class="mb-1 text-uppercase">Commercial Stores & Disposal Division, Jhansi Plant</p>
+          <h5 class="text-decoration-underline mt-2">MATERIAL DISPATCH CLEARANCE CHALLAN (MDCC)</h5>
+        </div>
+        <hr class="border border-dark">
+        <div class="row my-4">
+          <div class="col-6">
+            <p><strong>Gate Pass No:</strong> <span id="p-gatepass"></span></p>
+            <p><strong>Dispatch Date:</strong> <span id="p-date"></span></p>
+            <p><strong>Originating Department:</strong> <span id="p-dept"></span></p>
+            <p><strong>Consignee Destination:</strong> <span id="p-dest"></span></p>
+          </div>
+          <div class="col-6">
+            <p><strong>Transport Truck No:</strong> <span id="p-truck"></span></p>
+            <p><strong>Driver Name:</strong> <span id="p-dname"></span></p>
+            <p><strong>Driver License (DL):</strong> <span id="p-dlic"></span></p>
+            <p><strong>Driver Contact No:</strong> <span id="p-dphone"></span></p>
+          </div>
+        </div>
+
+        <table class="table table-bordered border-dark text-center my-4">
+          <thead>
+            <tr>
+              <th class="text-start">Description of Scrap</th>
+              <th>Net Weight (kg)</th>
+              <th>Base Rate (per kg)</th>
+              <th>Assessable Value (INR)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="p-material" class="text-start"></td>
+              <td id="p-weight"></td>
+              <td id="p-rate"></td>
+              <td id="p-base-val"></td>
+            </tr>
+            <tr>
+              <td colspan="3" class="text-end"><strong>CGST @ 9% :</strong></td>
+              <td id="p-cgst"></td>
+            </tr>
+            <tr>
+              <td colspan="3" class="text-end"><strong>SGST @ 9% :</strong></td>
+              <td id="p-sgst"></td>
+            </tr>
+            <tr>
+              <td colspan="3" class="text-end"><strong>TCS @ 1% (u/s 206C) :</strong></td>
+              <td id="p-tcs"></td>
+            </tr>
+            <tr>
+              <td colspan="3" class="text-end"><strong>GRAND TOTAL (Tax Invoice Value) :</strong></td>
+              <td id="p-grand-total"></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="row mt-5 pt-5">
+          <div class="col-4 text-center">
+            <br><br>
+            <p class="mb-0">___________________</p>
+            <p><strong>Consignee Driver Sign</strong></p>
+          </div>
+          <div class="col-4 text-center">
+            <br><br>
+            <p class="mb-0">___________________</p>
+            <p><strong>Security In-Charge Sign</strong></p>
+          </div>
+          <div class="col-4 text-center">
+            <br><br>
+            <p class="mb-0">___________________</p>
+            <p><strong>BHEL Stores Officer Sign</strong></p>
+          </div>
+        </div>
+      </div>
+      <div class="text-center my-3 print-btn-div">
+        <button onclick="window.print()" class="btn btn-primary px-4">Print/Save to PDF</button>
+        <button onclick="closePrintView()" class="btn btn-secondary px-4">Close View</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detailed receipt modal -->
+  <div class="modal fade" id="receiptModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title">BHEL Completed Consignment Receipt</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="modal-receipt-body"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+    <script src="js/history.js"></script>
+</body>
+</html>
